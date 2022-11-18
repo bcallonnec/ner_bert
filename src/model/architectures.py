@@ -3,8 +3,9 @@ from typing import Any, Optional, Tuple
 
 import torch
 from torch import Tensor, nn
-from torch_utils import leaky_relu_initializer, relu_initializer, tanh_initializer
 from transformers import AdamW, get_linear_schedule_with_warmup
+
+from src.model.torch_utils import leaky_relu_initializer, relu_initializer, tanh_initializer
 
 
 def predict_labels_fn_ner(outputs: Tensor) -> Tuple[Tensor, Tensor]:

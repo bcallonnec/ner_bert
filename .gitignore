@@ -1,0 +1,6 @@
+.vscode
+__pycache__
+outputs
+mlflow_runs
+tensorboard_runs
+save

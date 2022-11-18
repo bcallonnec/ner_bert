@@ -1,7 +1,6 @@
 """
 Define Model objects that are dependent on the pytorch library.
 """
-
 from typing import Any, Callable, Dict, Optional, Sequence, Tuple
 
 import numpy as np
@@ -53,6 +52,9 @@ class NERModel(nn.Module):
         """
         super().__init__()
 
+        # Exclude elements from save
+        self.exclude_list = ["scheduler", "optimizer"]
+
         # Instantiate device
         self.device = device
 
@@ -88,7 +90,7 @@ class NERModel(nn.Module):
         assert self._loss_fn is not None
         return self._loss_fn(output, target, **kwargs)
 
-    def instantiate_network(self, n_meta_features: int, num_labels: int) -> None:
+    def instantiate_network(self, num_labels: int) -> None:
         """Function called by build_network() of MelusineModel"""
         # Instantiate fine tuning network
         self.dense_net = self.dense_net()
@@ -263,3 +265,47 @@ class NERModel(nn.Module):
         probas = probas.detach().cpu().to(probas_batch.dtype).numpy()
 
         return preds, probas
+
+    def save(self, path: str) -> None:
+        """Save model at given path"""
+        # Set device model to cpu
+        self.device = "cpu"
+
+        # Set training arguments we do not save to None
+        for elem in self.exclude_list:
+            setattr(self, elem, None)
+
+        # Don't save pretrained model if layers are freezed
+        if self.freeze_pre_trained_layers:
+            self.pretrained_model = None
+
+        # Save model
+        torch.save(self, path)
+
+    @classmethod
+    def load(cls, path: str, pretrained_model_path: Optional[str] = None) -> Any:
+        """
+        Load the model given its path
+
+        Parameters
+        ----------
+        path: str
+            Load path
+        pretrained_model_path: Optional[str]
+            Pretrained model path
+        Returns
+        -------
+        TransformerTorchModel
+        """
+        loaded_model = torch.load(path, map_location=torch.device("cpu"))
+
+        # Load pretrained model
+        if (
+            hasattr(loaded_model, "pretrained_model")
+            and loaded_model.pretrained_model is None
+            and pretrained_model_path
+        ):
+            loaded_pretrained_model = AutoModel.from_pretrained(pretrained_model_path, return_dict=True)
+            loaded_model.pretrained_model = loaded_pretrained_model
+
+        return loaded_model

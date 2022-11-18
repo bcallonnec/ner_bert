@@ -1,11 +1,20 @@
+# Save path
+model_path: save/trained_model
+
 # MLflow params
-experiment_name: melusine_attestation_ner
+experiment_name: ner_task
+
+# Debug config
+test_mode: False
 
 # Data
 data:
   _target_: datasets.load_dataset
   path: wikiann
   name: fr
+  split:
+  - train
+  - validation
 
 # Torch Dataset
 loss_ignore_index: -100
@@ -15,7 +24,7 @@ seq_max: 64
 # Dataset train params
 batch_size: 64
 shuffle_data: True
-num_data_workers: 20
+num_data_workers: 4
 
 # Model train params
 epochs: 10
@@ -24,13 +33,14 @@ loss_fn:
   path: src.model.architectures.loss_fn_ner
 learning_rate: 3e-05
 weight_decay: 0.001
+warmup_steps: 0
 
 # Pretrained tranformers name
 pretrained_model_name_or_path: camembert-base
 
 # Tokenizer
 tokenizer:
-  _target_: AutoTokenizer.from_pretrained
+  _target_: transformers.AutoTokenizer.from_pretrained
   pretrained_model_name_or_path: ${pretrained_model_name_or_path}
 
 # Torch Model

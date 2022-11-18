@@ -1,0 +1,36 @@
+# Model path
+model_path: save/trained_model
+
+# Pretrained tranformers name
+pretrained_model_name_or_path: camembert-base
+
+# Debug config
+test_mode: False
+
+# Data
+data:
+  _target_: datasets.load_dataset
+  path: wikiann
+  name: fr
+  split: test
+
+# Torch Dataset
+loss_ignore_index: -100
+propagate_label_to_word_pieces: True
+seq_max: 64
+
+# Dataset params
+batch_size: 1
+shuffle_data: False
+num_data_workers: 1
+
+# Tokenizer
+tokenizer:
+  _target_: transformers.AutoTokenizer.from_pretrained
+  pretrained_model_name_or_path: ${pretrained_model_name_or_path}
+
+# Model
+model:
+  _target_: src.model.NERModel.load
+  path: ${model_path}
+  pretrained_model_path: ${pretrained_model_name_or_path}
