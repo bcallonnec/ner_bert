@@ -128,7 +128,7 @@ def main(cfg: Any) -> None:
     tensorboard_path = f"../../../tensorboard_runs/{cfg.experiment_name}/"
 
     if cfg.test_mode:
-        # save_model = False
+        save_model = False
         cfg.epochs = 1
         cfg.data["split"] = ["train[:20]", "validation[:20]"]
 
