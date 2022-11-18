@@ -1,0 +1,51 @@
+# MLflow params
+experiment_name: melusine_attestation_ner
+
+# Data
+data:
+  _target_: datasets.load_dataset
+  path: wikiann
+  name: fr
+
+# Torch Dataset
+loss_ignore_index: -100
+propagate_label_to_word_pieces: True
+seq_max: 64
+
+# Dataset train params
+batch_size: 64
+shuffle_data: True
+num_data_workers: 20
+
+# Model train params
+epochs: 10
+loss_fn:
+  _target_: hydra.utils.get_method
+  path: src.model.architectures.loss_fn_ner
+learning_rate: 3e-05
+weight_decay: 0.001
+
+# Pretrained tranformers name
+pretrained_model_name_or_path: camembert-base
+
+# Tokenizer
+tokenizer:
+  _target_: AutoTokenizer.from_pretrained
+  pretrained_model_name_or_path: ${pretrained_model_name_or_path}
+
+# Torch Model
+model:
+  _target_: src.model.NERModel
+  pretrained_model_name_or_path: ${pretrained_model_name_or_path}
+  freeze_pre_trained_layers: True
+  transformers_output: last_hidden_state
+  dense_archi:
+    _target_: hydra.utils.get_method
+    path: src.model.architectures.dense_archi_ner
+  output_archi:
+    _target_: hydra.utils.get_method
+    path: src.model.architectures.output_archi_ner
+  predict_labels_fn:
+    _target_: hydra.utils.get_method
+    path: src.model.architectures.predict_labels_fn_ner
+  device: 'cpu'

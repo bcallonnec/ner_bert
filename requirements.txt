@@ -1,0 +1,11 @@
+transformers
+torch
+pandas
+numpy
+scikit-learn
+tqdm
+hydra
+mlflow
+omegaconf
+seqeval
+datasets
