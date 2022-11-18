@@ -1,7 +1,7 @@
 """
 Define Dataset objects used by pytorch models.
 """
-from typing import Any, Dict, Optional, Sequence, Union
+from typing import Any, Dict, Sequence, Union
 
 import torch
 from torch.utils.data import DataLoader, Dataset
@@ -15,7 +15,7 @@ class NERDataset(Dataset):
         texts: Union[str, Sequence[Any]],
         tokenizer: Any,
         max_len: int,
-        labels: Optional[Sequence[Any]] = None,
+        labels: Sequence[Any],
         loss_ignore_index: int = -100,
         propagate_label_to_word_pieces: bool = False,
     ) -> None:
@@ -29,7 +29,7 @@ class NERDataset(Dataset):
             Usually a pretrained tokenizer from HuggingFace
         max_len: int
             the max len of the list of tokens
-        labels: Optional[Sequence[Any]]
+        labels: Sequence[Any]
             The corresponding tag of each token
         loss_ignore_index: int
             Label index that will be ignore by the loss function
@@ -38,9 +38,8 @@ class NERDataset(Dataset):
         """
         # Convert str sentence to list of tokens
         texts = [elem.split() if isinstance(elem, str) else elem for elem in texts]
-        if labels is None:
-            labels = [[0] * len(tokens) for tokens in texts]
 
+        # Set class attributes
         self.texts: Sequence[Any] = texts
         self.labels: Sequence[Any] = labels
         self.tokenizer: Any = tokenizer
