@@ -125,12 +125,12 @@ def main(cfg: Any) -> None:
     # Set Tensorboard saving directory
     # By default hydra will log everything in output/date/time
     # This is not handy when we want to compare several runs
-    tensorboard_path = f"../../../tensorboard_runs/{cfg.experiment_name}/"
+    tensorboard_path = f"./tensorboard_runs/{cfg.experiment_name}/"
 
     if cfg.test_mode:
         save_model = False
-        cfg.epochs = 1
-        cfg.data["split"] = ["train[:20]", "validation[:20]"]
+        cfg.epochs = 2
+        cfg.data["split"] = ["train[:100]", "validation[:100]"]
 
     # Load train data
     data_train, data_valid = hydra.utils.instantiate(cfg.data, _convert_="all")
