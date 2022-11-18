@@ -76,7 +76,6 @@ class NERModel(nn.Module):
         self.scheduler: Any = None
 
         # Loss function and labels weights initialization
-        self.labels_weights: Optional[Sequence[float]] = None
         self._loss_fn: Optional[Callable] = None
 
         # Configure predict_labels function
@@ -157,7 +156,7 @@ class NERModel(nn.Module):
 
         outputs = self(**batch)
 
-        loss = self.loss_fn(outputs, targets, weights=self.labels_weights, num_labels=num_labels, **batch)
+        loss = self.loss_fn(outputs, targets, num_labels=num_labels, **batch)
 
         loss.backward()
 

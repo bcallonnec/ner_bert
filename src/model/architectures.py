@@ -17,13 +17,6 @@ def predict_labels_fn_ner(outputs: Tensor) -> Tuple[Tensor, Tensor]:
     return predict_labels, predict_scores.values
 
 
-def output_archi_ner(in_features: int, num_labels: int) -> nn.Sequential:
-    """Transformers deep Learning architecture for the NER task"""
-    return nn.Sequential(
-        nn.Linear(in_features, num_labels),
-    )
-
-
 def dense_archi_ner() -> nn.Sequential:
     """Dense architecture right after pretrained transformers model."""
     return nn.Sequential(
@@ -33,12 +26,18 @@ def dense_archi_ner() -> nn.Sequential:
     )
 
 
+def output_archi_ner(in_features: int, num_labels: int) -> nn.Sequential:
+    """Transformers deep Learning architecture for the NER task"""
+    return nn.Sequential(
+        nn.Linear(in_features, num_labels),
+    )
+
+
 def loss_fn_ner(output: Tensor, target: Tensor, **kwargs: Any) -> Tensor:
     """Loss function specific for NER task"""
-    weights: Tensor = kwargs.pop("weights", None)
     mask: Tensor = kwargs.pop("attention_mask")
     num_labels: Optional[int] = kwargs.pop("num_labels", None)
-    lfn = nn.CrossEntropyLoss(weight=weights)
+    lfn = nn.CrossEntropyLoss()
     active_loss: Tensor = mask.view(-1) == 1
     active_logits: Tensor = output.view(-1, num_labels)
     active_labels: Tensor = torch.where(active_loss, target.view(-1), torch.tensor(lfn.ignore_index).type_as(target))
