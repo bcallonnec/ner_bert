@@ -17,7 +17,7 @@ from src.model.torch_utils import get_last_out_features
 
 class NERModel(nn.Module):
     """
-    Bert model fine tuned for classification task
+    Bert model fine tuned for ner task
     """
 
     def __init__(
@@ -295,7 +295,7 @@ class NERModel(nn.Module):
             Pretrained model path
         Returns
         -------
-        TransformerTorchModel
+        NERModel
         """
         loaded_model = torch.load(path, map_location=torch.device("cpu"))
 
