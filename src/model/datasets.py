@@ -12,7 +12,7 @@ class NERDataset(Dataset):
 
     def __init__(
         self,
-        texts: Union[str, Sequence[Any]],
+        texts: Sequence[Union[str, List[str]],
         tokenizer: Any,
         max_len: int,
         labels: Sequence[Any],
@@ -23,7 +23,7 @@ class NERDataset(Dataset):
         Init function
         Parameters
         ----------
-        texts: Union[str, Sequence[Any]]
+        texts: Sequence[Union[str, List[str]]
             List of tokenized text. The sentence is tokenized into a list of token.
         tokenizer: Any
             Usually a pretrained tokenizer from HuggingFace
