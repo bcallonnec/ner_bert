@@ -33,7 +33,7 @@ def train_model(
     num_labels: int,
     loss_fn: Callable,
     tensorboard_writer: SummaryWriter,
-) -> None:
+) -> NERModel:
     """
     Method to launch the model training.
 
@@ -84,6 +84,8 @@ def train_model(
                     for log, value in logs_info.items():
                         tensorboard_writer.add_scalar(log, value)
                     tensorboard_writer.flush()
+                    
+    return model
 
 
 def validate_model(model: NERModel, data_loader: DataLoader, num_labels: int) -> Dict[str, float]:
@@ -189,7 +191,7 @@ def main(cfg: Any) -> None:
         log_hydra_params(cfg)
         mlflow.log_params(extra_params)
 
-        train_model(
+        trained_model = train_model(
             model,
             train_data_loader=train_data_loader,
             valid_data_loader=valid_data_loader,
@@ -200,13 +202,13 @@ def main(cfg: Any) -> None:
         )
 
         # Log torch model
-        mlflow.pytorch.log_model(artifact_path="model", pytorch_model=model)
+        mlflow.pytorch.log_model(artifact_path="model", pytorch_model=trained_model)
 
         # Log tensorboard events
         mlflow.log_artifacts(tensorboard_path, artifact_path="tensorboard_logs")
 
         if save_model:
-            model.save(cfg.model_path)
+            trained_model.save(cfg.model_path)
 
 
 if __name__ == "__main__":
