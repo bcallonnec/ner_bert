@@ -15,12 +15,12 @@ from src.model.datasets import NERDataset
 @hydra.main(config_path="conf", config_name="predict", version_base=hydra.__version__)
 def main(cfg: Any) -> None:
     """
-    Main function that train the model
+    Main function to infer the mode
     """
     if cfg.test_mode:
         cfg.data["split"] = "test[:20]"
 
-    # Load train data
+    # Load test data
     data_test = hydra.utils.instantiate(cfg.data, _convert_="all")
 
     # Instantiate tokenizer
