@@ -22,7 +22,6 @@ def dense_archi_ner() -> nn.Sequential:
     return nn.Sequential(
         nn.Linear(768, 768),
         nn.Tanh(),
-        nn.Dropout(0.1),
     )
 
 
