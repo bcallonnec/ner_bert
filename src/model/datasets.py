@@ -4,7 +4,9 @@ Define Dataset objects used by pytorch models.
 from typing import Any, Dict, Sequence, Union
 
 import torch
+from torch import Tensor
 from torch.utils.data import DataLoader, Dataset
+from transformers import PreTrainedTokenizer
 
 
 class NERDataset(Dataset):
@@ -13,9 +15,9 @@ class NERDataset(Dataset):
     def __init__(
         self,
         texts: Sequence[Union[str, List[str]],
-        tokenizer: Any,
+        tokenizer: PreTrainedTokenizer,
         max_len: int,
-        labels: Sequence[Any],
+        labels: Sequence[List[str]],
         loss_ignore_index: int = -100,
         propagate_label_to_word_pieces: bool = False,
     ) -> None:
@@ -25,11 +27,11 @@ class NERDataset(Dataset):
         ----------
         texts: Sequence[Union[str, List[str]]
             List of tokenized text. The sentence is tokenized into a list of token.
-        tokenizer: Any
+        tokenizer: PreTrainedTokenizer
             Usually a pretrained tokenizer from HuggingFace
         max_len: int
             the max len of the list of tokens
-        labels: Sequence[Any]
+        labels: Sequence[List[str]]
             The corresponding tag of each token
         loss_ignore_index: int
             Label index that will be ignore by the loss function
@@ -40,9 +42,9 @@ class NERDataset(Dataset):
         texts = [elem.split() if isinstance(elem, str) else elem for elem in texts]
 
         # Set class attributes
-        self.texts: Sequence[Any] = texts
-        self.labels: Sequence[Any] = labels
-        self.tokenizer: Any = tokenizer
+        self.texts: Sequence[List[str]] = texts
+        self.labels: Sequence[List[str]] = labels
+        self.tokenizer: PreTrainedTokenizer = tokenizer
         self.max_len: int = max_len
         self.loss_ignore_index: int = loss_ignore_index
         self.propagate_label_to_word_pieces: bool = propagate_label_to_word_pieces
@@ -51,7 +53,7 @@ class NERDataset(Dataset):
         """Get len of dataset"""
         return len(self.texts)
 
-    def __getitem__(self, index: int) -> Dict[str, Sequence]:
+    def __getitem__(self, index: int) -> Dict[str, Tensor]:
         """Get item at index"""
         text = self.texts[index]
         tags = self.labels[index]
