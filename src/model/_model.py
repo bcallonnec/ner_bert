@@ -7,6 +7,7 @@ import numpy as np
 import torch
 from sklearn import metrics
 from torch import nn
+from torch import Tensor
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoModel
@@ -84,7 +85,7 @@ class NERModel(nn.Module):
         # Put on device
         self.to(self.device)
 
-    def loss_fn(self, output: torch.Tensor, target: torch.Tensor, **kwargs: Any) -> Any:
+    def loss_fn(self, output: Tensor, target: Tensor, **kwargs: Any) -> Tensor:
         """Get arount mypy issue 708"""
         assert self._loss_fn is not None
         return self._loss_fn(output, target, **kwargs)
@@ -132,7 +133,7 @@ class NERModel(nn.Module):
         # Configure loss function
         self._loss_fn = loss_fn or predict_labels_fn_ner
 
-    def forward(self, **inputs: Any) -> Any:
+    def forward(self, **inputs: Dict[str, Tensor]) -> Tensor:
         """Apply torch forward algorithm"""
         # Get embeddings data
         output = self.pretrained_model(**inputs)
@@ -145,7 +146,7 @@ class NERModel(nn.Module):
 
         return output
 
-    def training_step(self, batch: Any, num_labels: Optional[int] = None) -> Any:
+    def training_step(self, batch: Dict[str, Tensor], num_labels: Optional[int] = None) -> Tensor:
         """Training step for pytorch lightning Trainer"""
         for key, var in batch.items():
             batch[key] = var.to(self.device)
@@ -196,11 +197,11 @@ class NERModel(nn.Module):
         metric_dict["val_f1"] = metrics.f1_score(targets, preds, average="macro")
         return metric_dict
 
-    def validation_step(self, batch: Any, num_labels: Optional[int] = None) -> Dict[str, Any]:
+    def validation_step(self, batch: Dict[str, Tensor], num_labels: Optional[int] = None) -> Dict[str, Any]:
         """Validation step for pytorch lightning Trainer"""
         return self._shared_eval_step(batch=batch, num_labels=num_labels)
 
-    def test_step(self, batch: Any, num_labels: Optional[int] = None) -> Dict[str, Any]:
+    def test_step(self, batch: Dict[str, Tensor], num_labels: Optional[int] = None) -> Dict[str, Any]:
         """Test step"""
         return self._shared_eval_step(batch=batch, num_labels=num_labels)
 
@@ -212,7 +213,7 @@ class NERModel(nn.Module):
         """Test epoch end log metrics"""
         return self._shared_eval_epoch_end(outputs)
 
-    def predict_step(self, batch: Any) -> Tuple[torch.Tensor, torch.Tensor]:
+    def predict_step(self, batch: Dict[str, Tensor]) -> Tuple[Tensor, Tensor]:
         """Predict"""
         _ = batch.pop("targets")
         for key, var in batch.items():
